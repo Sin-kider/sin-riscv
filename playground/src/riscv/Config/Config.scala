@@ -21,4 +21,10 @@ object CONFIG {
     val NUM       = if (RISCV.RVE) 16 else 32
     val NUM_WIDTH = log2Ceil(NUM)
   }
+  object DATA {
+    val B = 8
+    val H = 2 * B
+    val W = 2 * H
+    val D = 2 * W
+  }
 }

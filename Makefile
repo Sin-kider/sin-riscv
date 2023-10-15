@@ -30,8 +30,9 @@ VAL_VSRC_PATH     = $(foreach dir,$(VAL_VSRC_DIR),$(wildcard $(dir)/*.v)) $(fore
 SIM_BINFILE_PATH  = $(SIM_BUILD_DIR)/$(TOP_NAME)
 SIM_OBJ_DIR       = $(SIM_BUILD_DIR)/temp
 SIM_WAVE_PATH     = $(SIM_BUILD_DIR)/wave.vcd
+VAL_LIBS += $(shell llvm-config --libs)
+VAL_LDFLAGS = $(foreach lib, $(VAL_LIBS), -LDFLAGS $(lib))
 
-# VAL_LIBS = 
 
 export PATH := $(PATH):$(CHISEL_FIRTOOL_PATH)
 
@@ -55,7 +56,7 @@ $(SIM_BINFILE_PATH): $(VAL_VSRC_PATH) $(SIM_SRC_PATH) $(CHISEL_BUILD_TOP_VSRC)
 	  --top-module $(TOP_NAME) \
 		$(SIM_SRC_PATH) $(CHISEL_BUILD_VSRC) \
 		$(VAL_CFLAGS) --Mdir $(SIM_OBJ_DIR) --trace --exe \
-		-o $@ $(VAL_LIBS) -j 8
+		-o $@ $(VAL_LDFLAGS) -j 8
 
 $(CHISEL_BUILD_TOP_VSRC): $(CHISEL_SRC_PATH) $(VAL_VSRC_PATH)
 	@echo MKDIR $(CHISEL_BUILD_DIR)

@@ -19,9 +19,9 @@ class IFU extends Module {
   val nextPC   = WireDefault(0.U(CONFIG.ADDR.WIDTH.W))
 
   val PCReg = RegNext(nextPC, CONFIG.ADDR.BASE.U)
-  isChange := ioLC.isJump | (ioLC.isBranch & ioLC.branchResult) | ioLC.isEcall
+  isChange := ioLC.isJump | (ioLC.isBranch & ioLC.isBranchSuccess) | ioLC.isEcall
   stepNum  := Mux(ioLC.isCompress & PCReg =/= CONFIG.ADDR.BASE.U, 2.U, 4.U)
-  nextPC   := Mux(isChange, ioLC.pcIn, PCReg + stepNum)
+  nextPC   := Mux(isChange, ioLC.pcIn, PCReg + Mux(ioLC.isStall, 0.U, stepNum))
 
   // inst
   ioIMEM.addr := nextPC

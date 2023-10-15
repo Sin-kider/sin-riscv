@@ -11,8 +11,9 @@ import riscv.IDU._
 import riscv.Util._
 
 class TopBundle extends Bundle {
-  val inst = Output(UInt(CONFIG.INST.WIDTH.W))
-  val npc  = Output(UInt(CONFIG.ADDR.WIDTH.W))
+  val isStall = Input(Bool())
+  val inst    = Output(UInt(CONFIG.INST.WIDTH.W))
+  val npc     = Output(UInt(CONFIG.ADDR.WIDTH.W))
   // for test
   val pc = Output(UInt(CONFIG.ADDR.WIDTH.W))
 }
@@ -30,7 +31,8 @@ class Top extends Module {
   logicCtrl.ioIFU <> IFU.ioLC
   logicCtrl.ioIDU <> IDU.ioLC
 
-  io.inst := IFU.ioIFU.inst
-  io.npc  := IFU.ioIFU.npc
-  io.pc   := IFU.ioIFU.pc
+  io.inst                 := IFU.ioIFU.inst
+  io.npc                  := IFU.ioIFU.npc
+  io.pc                   := IFU.ioIFU.pc
+  logicCtrl.ioDeb.isStall := io.isStall
 }
