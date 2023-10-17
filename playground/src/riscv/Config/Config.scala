@@ -15,16 +15,18 @@ object CONFIG {
   }
   object INST {
     val WIDTH   = 32
-    val C_WIDTH = if (RISCV.RVC) 16 else 32
+    val C_WIDTH = 16
   }
   object REG {
     val NUM       = if (RISCV.RVE) 16 else 32
+    val WIDTH     = if (RISCV.RV64) 64 else 32
     val NUM_WIDTH = log2Ceil(NUM)
   }
   object DATA {
-    val B = 8
-    val H = 2 * B
-    val W = 2 * H
-    val D = 2 * W
+    val XLEN = if (RISCV.RV64) 64 else 32
+    val B    = 8
+    val H    = 2 * B
+    val W    = 2 * H
+    val D    = 2 * W
   }
 }

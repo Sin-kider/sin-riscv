@@ -12,7 +12,6 @@ class logicCtrl extends Module {
   val ioDeb = IO(new logicCtrlDebBundle)
   Tools.ignoreBundle(ioIFU)
   Tools.ignoreBundle(ioIDU)
-  ioIFU.isCompress := ioIDU.isCompress
 
   // for test
   ioIFU.isStall := ioDeb.isStall

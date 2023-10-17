@@ -90,6 +90,7 @@ void init_disasm(const char *triple) {
                                     *gMII, *gMRI);
   gIP->setPrintImmHex(true);
   gIP->setPrintBranchImmAsAddress(true);
+  gIP->setUseMarkup(true);
 }
 
 void disassemble(char *str, int size, uint64_t pc, uint8_t *code, int nbyte) {

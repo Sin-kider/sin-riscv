@@ -21,17 +21,19 @@ SIM_DIR           = $(TOP_DIR)/sim
 SIM_BUILD_DIR     = $(BUILD_DIR)/sim
 SIM_SRC_DIR       = $(SIM_DIR)/src
 SIM_INC_DIR       = $(SIM_DIR)/inc
+SIM_INC_PATH      = $(foreach dir, $(shell find $(SIM_INC_DIR) -maxdepth 3 -type d), $(wildcard $(dir)/*.h))
+SIM_ALL_INC_DIR   = $(sort $(dir $(SIM_INC_PATH)))
 SIM_SRC_PATH      = $(foreach dir, $(shell find $(SIM_SRC_DIR) -maxdepth 3 -type d), $(wildcard $(dir)/*.cpp))
 VAL_FLAGS        += -MMD --build -cc -O3 --x-assign fast --x-initial fast --noassert -Wno-WIDTHEXPAND
-VAL_CFLAGS_TEMP   = -Wno-builtin-macro-redefined $(foreach dir, $(SIM_INC_DIR), -I$(dir))
+VAL_CFLAGS_TEMP   = -Wno-builtin-macro-redefined $(foreach dir, $(SIM_ALL_INC_DIR), -I$(dir))
 VAL_CFLAGS        = $(foreach temp, $(VAL_CFLAGS_TEMP), -CFLAGS $(temp))
 VAL_VSRC_DIR      = $(CHISEL_TEST_DIR)/resources
 VAL_VSRC_PATH     = $(foreach dir,$(VAL_VSRC_DIR),$(wildcard $(dir)/*.v)) $(foreach dir,$(VAL_VSRC_DIR),$(wildcard $(dir)/*.sv))
 SIM_BINFILE_PATH  = $(SIM_BUILD_DIR)/$(TOP_NAME)
 SIM_OBJ_DIR       = $(SIM_BUILD_DIR)/temp
 SIM_WAVE_PATH     = $(SIM_BUILD_DIR)/wave.vcd
-VAL_LIBS += $(shell llvm-config --libs)
-VAL_LDFLAGS = $(foreach lib, $(VAL_LIBS), -LDFLAGS $(lib))
+VAL_LIBS         += $(shell llvm-config --libs)
+VAL_LDFLAGS       = $(foreach lib, $(VAL_LIBS), -LDFLAGS $(lib))
 
 
 export PATH := $(PATH):$(CHISEL_FIRTOOL_PATH)

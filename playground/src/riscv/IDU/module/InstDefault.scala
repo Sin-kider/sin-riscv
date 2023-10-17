@@ -91,3 +91,16 @@ object mem {
   val SW    = 10.U(WIDTH.W)
   val SD    = 11.U(WIDTH.W)
 }
+
+object csr {
+  val WIDTH = log2Ceil(6)
+  val NOP   = 0.U(WIDTH.W)
+  val RC    = 1.U(WIDTH.W)
+  val RW    = 1.U(WIDTH.W)
+  val RS    = 1.U(WIDTH.W)
+}
+
+object ALL {
+  val defaultList = rs1.NOP :: rs2.NOP :: rd.NOP :: op1.NOP :: op2.NOP :: imm.N :: alu.NOP :: branch.NOP :: mem.NOP :: csr.NOP :: Nil
+  val instList    = RV32I.table
+}

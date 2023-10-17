@@ -8,7 +8,7 @@ import riscv.DPIC._
 
 class IMem extends Module {
   val io = IO(new IMemBundle)
-
+  io.state.valid := true.B
   // imem
   val dpicGetInst = Module(new dpicGetInst)
   dpicGetInst.io.clock := clock

@@ -73,7 +73,7 @@ int count = 0;
 int main(void) {
   sim_init();
   reset();
-  while (VTOP->io_pc <= HEX_CODE_LEN + 0x80000000) {
+  while (VTOP->io_pc <= CODE_LEN + 0x80000000) {
     test_IFU();
     // if (VTOP->io_pc == 0x80000010) {
     //   VTOP->io_isStall = 1;

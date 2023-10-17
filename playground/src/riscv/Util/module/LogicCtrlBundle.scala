@@ -5,7 +5,6 @@ import chisel3.util._
 import riscv.Config._
 
 class logicCtrlIFUBundle extends Bundle {
-  val isCompress      = Output(Bool())
   val isJump          = Output(Bool())
   val isBranch        = Output(Bool())
   val isEcall         = Output(Bool())
@@ -14,8 +13,7 @@ class logicCtrlIFUBundle extends Bundle {
   val pcIn            = Output(UInt(CONFIG.ADDR.WIDTH.W))
 }
 class logicCtrlIDUBundle extends Bundle {
-  val isCompress = Input(Bool())
-  val isStall    = Output(Bool())
+  val isStall = Output(Bool())
 }
 class logicCtrlDebBundle extends Bundle {
   val isStall = Input(Bool())

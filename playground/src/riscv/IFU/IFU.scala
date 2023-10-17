@@ -20,8 +20,8 @@ class IFU extends Module {
 
   val PCReg = RegNext(nextPC, CONFIG.ADDR.BASE.U)
   isChange := ioLC.isJump | (ioLC.isBranch & ioLC.isBranchSuccess) | ioLC.isEcall
-  stepNum  := Mux(ioLC.isCompress & PCReg =/= CONFIG.ADDR.BASE.U, 2.U, 4.U)
-  nextPC   := Mux(isChange, ioLC.pcIn, PCReg + Mux(ioLC.isStall, 0.U, stepNum))
+  stepNum  := Mux(ioLC.isStall, 0.U, 4.U)
+  nextPC   := Mux(isChange, ioLC.pcIn, PCReg + stepNum)
 
   // inst
   ioIMEM.addr := nextPC
@@ -29,6 +29,36 @@ class IFU extends Module {
 
   // io
   ioIFU.npc := nextPC
+
+  val ifIdle :: ifPcReady :: ifWaitInst :: ifValid :: Nil = Enum(4)
+  val state                                               = RegInit(ifIdle)
+  switch(state) {
+    is(ifIdle) {
+      when(!ioLC.isStall) {
+        state := ifPcReady
+      }
+    }
+    is(ifPcReady) {
+      // TODO
+      // when(?) {
+      //   state := ifWaitInst
+      // }.otherwise {
+      //   state := ifPcReady
+      // }
+      state := ifWaitInst
+    }
+    is(ifWaitInst) {
+      when(ioIMEM.state.valid) {
+        state := ifValid
+      }.otherwise {
+        state := ifWaitInst
+      }
+    }
+    is(ifValid) {
+      state := ifIdle
+    }
+  }
+  ioIMEM.state.ready := true.B
 
   // for test
   ioIFU.pc := PCReg
