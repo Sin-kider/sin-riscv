@@ -9,56 +9,57 @@ import riscv.IDU.module._
 import riscv.Util.module._
 
 class IFU extends Module {
-  val ioIFU  = IO(new IFUBundle)
-  val ioIDU  = IO(Flipped(new IDUBundle))
-  val ioLC   = IO(Flipped(new logicCtrlIFUBundle))
-  val ioIMEM = IO(Flipped(new IMemBundle))
+  val ioIFU = IO(new IFUBundle)
+  val ioIDU = IO(Flipped(new IDUBundle))
+  val ioLC  = IO(Flipped(new logicCtrlIFUBundle))
+  val ioAXI = IO(new AXILiteMaster)
   // next pc
   val isChange = WireDefault(false.B)
   val stepNum  = WireDefault(0.U(CONFIG.ADDR.WIDTH.W))
   val nextPC   = WireDefault(0.U(CONFIG.ADDR.WIDTH.W))
+  val regEn    = WireDefault(false.B)
 
-  val PCReg = RegNext(nextPC, CONFIG.ADDR.BASE.U)
+  val PCReg = RegEnable(nextPC, CONFIG.ADDR.BASE.U, regEn)
   isChange := ioLC.isJump | (ioLC.isBranch & ioLC.isBranchSuccess) | ioLC.isEcall
   stepNum  := Mux(ioLC.isStall, 0.U, 4.U)
   nextPC   := Mux(isChange, ioLC.pcIn, PCReg + stepNum)
 
   // inst
-  ioIMEM.addr := nextPC
-  ioIFU.inst  := ioIMEM.data
+  val iWritePC :: iReadInst :: Nil = Enum(2)
 
-  // io
-  ioIFU.npc := nextPC
-
-  val ifIdle :: ifPcReady :: ifWaitInst :: ifValid :: Nil = Enum(4)
-  val state                                               = RegInit(ifIdle)
-  switch(state) {
-    is(ifIdle) {
-      when(!ioLC.isStall) {
-        state := ifPcReady
-      }
-    }
-    is(ifPcReady) {
-      // TODO
-      // when(?) {
-      //   state := ifWaitInst
-      // }.otherwise {
-      //   state := ifPcReady
-      // }
-      state := ifWaitInst
-    }
-    is(ifWaitInst) {
-      when(ioIMEM.state.valid) {
-        state := ifValid
+  val iState = RegInit(iWritePC)
+  regEn          := (iState === iReadInst && ioAXI.r.valid)
+  ioAXI.ar.valid := true.B
+  ioAXI.r.ready  := (iState === iReadInst)
+  ioAXI.ar.addr  := nextPC
+  ioAXI.ar.prot  := 0.U
+  ioAXI.aw.addr  := 0.U
+  ioAXI.aw.prot  := 0.U
+  ioAXI.aw.valid := false.B
+  ioAXI.w.data   := 0.U
+  ioAXI.w.strb   := 0.U
+  ioAXI.w.valid  := false.B
+  ioAXI.b.ready  := false.B
+  switch(iState) {
+    is(iWritePC) {
+      when(ioAXI.ar.ready) {
+        iState := iReadInst
       }.otherwise {
-        state := ifWaitInst
+        iState := iWritePC
       }
     }
-    is(ifValid) {
-      state := ifIdle
+    is(iReadInst) {
+      when(ioAXI.r.valid) {
+        iState := iWritePC
+      }.otherwise {
+        iState := iReadInst
+      }
     }
   }
-  ioIMEM.state.ready := true.B
+
+  // io
+  ioIFU.npc  := nextPC
+  ioIFU.inst := ioAXI.r.data
 
   // for test
   ioIFU.pc := PCReg

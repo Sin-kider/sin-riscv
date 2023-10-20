@@ -48,14 +48,8 @@ void test_IFU(void) {
   p += sprintf(p, "pc: 0x%08lx", VTOP->io_pc);
   memset(p, ' ', 1);
   p += 1;
-  uint32_t instTemp = (VTOP->io_inst & 0x03) == 0x03
-                          ? VTOP->io_inst
-                          : VTOP->io_inst & 0x0000FFFF;
-  if ((VTOP->io_inst & 0x03) == 0x03) {
-    p += sprintf(p, "inst: 0x%08x ", VTOP->io_inst);
-  } else {
-    p += sprintf(p, "inst: 0x    %04x ", VTOP->io_inst & 0x0000FFFF);
-  }
+  uint32_t instTemp = VTOP->io_inst;
+  p += sprintf(p, "inst: 0x%08x ", VTOP->io_inst);
   if (!first_run) {
     disassemble(p, 64, VTOP->io_pc, (uint8_t *)&instTemp, 4);
     VTOP->clock = 0;
@@ -83,6 +77,20 @@ int main(void) {
     //   }
     // }
   }
+  // VTOP->io_ar_addr = 0x80000000;
+  // VTOP->io_ar_valid = 1;
+  // VTOP->clock = 1;
+  // step_and_dump_wave();
+  // printf("%x %d\n", VTOP->io_r_data, VTOP->io_r_valid);
+  // VTOP->clock = 0;
+  // VTOP->io_r_ready = 1;
+  // VTOP->io_ar_valid = 1;
+  // VTOP->io_ar_addr = 0x80000004;
+  // step_and_dump_wave();
+  // VTOP->io_ar_valid = 1;
+  // VTOP->clock = 1;
+  // step_and_dump_wave();
+  // printf("%x %d\n", VTOP->io_r_data, VTOP->io_r_valid);
   sim_exit();
   return 0;
 }

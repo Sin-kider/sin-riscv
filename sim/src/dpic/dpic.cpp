@@ -259,10 +259,18 @@ uint8_t hex_code[HEX_CODE_LEN] = {
     0xDC, 0x0A, 0x00, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 
-int dpicGetInst(long long addr) {
-  if (addr >= 0x80000000) {
-    return *(uint32_t *)&hex_code[addr - 0x80000000];
-  } else {
-    return 0;
+void pmem_read(int arAddr, int *rData) {
+  *rData =
+      arAddr >= 0x80000000 ? *(uint32_t *)&(hex_code[arAddr - 0x80000000]) : 0;
+}
+
+void pmem_write(int awAddr, int wData, char wSbrt) {
+  if (awAddr < 0x80000000) {
+    return;
   }
+  int data = 0;
+  for (int i = 0; i < 4; i++) {
+    data |= ((wSbrt >> i) & 0x01) ? (0xFF << i * 8) & wData : 0;
+  }
+  *(uint32_t *)&hex_code[awAddr - 0x80000000] = data;
 }

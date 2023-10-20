@@ -5,9 +5,9 @@ import chisel3.util._
 
 object CONFIG {
   object RISCV {
-    val RV64 = true
+    val RV64 = false
     val RVE  = false
-    val RVC  = true
+    val RVC  = false
   }
   object ADDR {
     val BASE  = 0x7fff_fffcL
@@ -28,5 +28,9 @@ object CONFIG {
     val H    = 2 * B
     val W    = 2 * H
     val D    = 2 * W
+  }
+  object AXI {
+    val ADDR_WIDTH = ADDR.WIDTH
+    val DATA_WIDTH = DATA.XLEN
   }
 }

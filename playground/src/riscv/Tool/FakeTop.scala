@@ -9,6 +9,9 @@ import riscv.Config._
 import riscv.IFU._
 import riscv.IDU._
 import riscv.Util._
+import riscv.Util._
+
+// class Top extends SRAM {}
 
 class TopBundle extends Bundle {
   val isStall = Input(Bool())
@@ -23,11 +26,10 @@ class Top extends Module {
 
   val IFU       = Module(new IFU)
   val IDU       = Module(new IDU)
-  val IMem      = Module(new IMem)
   val logicCtrl = Module(new logicCtrl)
-
+  val SRAM      = Module(new SRAM)
   IFU.ioIFU <> IDU.ioIFU
-  IFU.ioIMEM <> IMem.io
+  SRAM.io <> IFU.ioAXI
   logicCtrl.ioIFU <> IFU.ioLC
   logicCtrl.ioIDU <> IDU.ioLC
 
