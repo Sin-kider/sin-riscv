@@ -260,6 +260,7 @@ uint8_t hex_code[HEX_CODE_LEN] = {
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 
 void pmem_read(int arAddr, int *rData) {
+  printf("read: %x\n", arAddr);
   *rData =
       arAddr >= 0x80000000 ? *(uint32_t *)&(hex_code[arAddr - 0x80000000]) : 0;
 }

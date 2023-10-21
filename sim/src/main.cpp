@@ -37,26 +37,32 @@ void reset(void) {
   VTOP->eval();
 }
 
-void test_IFU(void) {
-  static bool first_run = true;
-  if (!first_run) {
-    VTOP->clock = 1;
-    step_and_dump_wave();
-  }
+const char *regs[] = {"$0", "ra", "sp",  "gp",  "tp", "t0", "t1", "t2",
+                      "s0", "s1", "a0",  "a1",  "a2", "a3", "a4", "a5",
+                      "a6", "a7", "s2",  "s3",  "s4", "s5", "s6", "s7",
+                      "s8", "s9", "s10", "s11", "t3", "t4", "t5", "t6"};
+
+void printInst(uint32_t pc, uint32_t inst) {
   char buf[128] = {};
-  char *p = buf;
-  p += sprintf(p, "pc: 0x%08lx", VTOP->io_pc);
-  memset(p, ' ', 1);
-  p += 1;
-  uint32_t instTemp = VTOP->io_inst;
-  p += sprintf(p, "inst: 0x%08x ", VTOP->io_inst);
-  if (!first_run) {
-    disassemble(p, 64, VTOP->io_pc, (uint8_t *)&instTemp, 4);
-    VTOP->clock = 0;
-    step_and_dump_wave();
-  }
+  disassemble(buf, 128, (uint64_t)pc, (uint8_t *)&inst, 4);
   puts(buf);
-  first_run = false;
+}
+
+void test_IDU(void) {
+  printf("--- clock ---\n");
+  VTOP->clock = 1;
+  step_and_dump_wave();
+  if (VTOP->io_valid) {
+    printf("pc:\t%008x\n", VTOP->io_pc);
+    printf("inst:\t%08x ", VTOP->io_inst);
+    printInst(VTOP->io_pc, VTOP->io_inst);
+    printf("imm\t%d\n", VTOP->io_immData);
+    printf("rs1:\t%d(%3s)\n", VTOP->io_rs1Addr, regs[VTOP->io_rs1Addr]);
+    printf("rs2:\t%d(%3s)\n", VTOP->io_rs2Addr, regs[VTOP->io_rs2Addr]);
+    printf("rd:\t%d(%3s)\n", VTOP->io_rdAddr, regs[VTOP->io_rdAddr]);
+  }
+  VTOP->clock = 0;
+  step_and_dump_wave();
 }
 
 void sim_exit() {
@@ -67,30 +73,9 @@ int count = 0;
 int main(void) {
   sim_init();
   reset();
-  while (VTOP->io_pc <= CODE_LEN + 0x80000000) {
-    test_IFU();
-    // if (VTOP->io_pc == 0x80000010) {
-    //   VTOP->io_isStall = 1;
-    //   count++;
-    //   if (count > 20) {
-    //     break;
-    //   }
-    // }
+  while (count++ < 50) {
+    test_IDU();
   }
-  // VTOP->io_ar_addr = 0x80000000;
-  // VTOP->io_ar_valid = 1;
-  // VTOP->clock = 1;
-  // step_and_dump_wave();
-  // printf("%x %d\n", VTOP->io_r_data, VTOP->io_r_valid);
-  // VTOP->clock = 0;
-  // VTOP->io_r_ready = 1;
-  // VTOP->io_ar_valid = 1;
-  // VTOP->io_ar_addr = 0x80000004;
-  // step_and_dump_wave();
-  // VTOP->io_ar_valid = 1;
-  // VTOP->clock = 1;
-  // step_and_dump_wave();
-  // printf("%x %d\n", VTOP->io_r_data, VTOP->io_r_valid);
   sim_exit();
   return 0;
 }

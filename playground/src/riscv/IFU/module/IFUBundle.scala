@@ -7,8 +7,9 @@ import riscv.Config._
 import riscv.Util._
 
 class IFUBundle extends Bundle {
-  val inst = Output(UInt(CONFIG.INST.WIDTH.W))
-  val npc  = Output(UInt(CONFIG.ADDR.WIDTH.W))
-  // for test
-  val pc = Output(UInt(CONFIG.ADDR.WIDTH.W))
+  val inst  = Output(UInt(CONFIG.INST.WIDTH.W))
+  val pc    = Output(UInt(CONFIG.ADDR.WIDTH.W))
+  val valid = Output(Bool())
+  // // for test
+  // val npc = Output(UInt(CONFIG.ADDR.WIDTH.W))
 }

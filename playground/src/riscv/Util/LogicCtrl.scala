@@ -14,5 +14,4 @@ class logicCtrl extends Module {
   Tools.ignoreBundle(ioIDU)
 
   // for test
-  ioIFU.isStall := ioDeb.isStall
 }

@@ -10,31 +10,29 @@ import riscv.IFU._
 import riscv.IDU._
 import riscv.Util._
 import riscv.Util._
+import riscv.IDU.module._
 
 // class Top extends SRAM {}
 
-class TopBundle extends Bundle {
-  val isStall = Input(Bool())
-  val inst    = Output(UInt(CONFIG.INST.WIDTH.W))
-  val npc     = Output(UInt(CONFIG.ADDR.WIDTH.W))
-  // for test
-  val pc = Output(UInt(CONFIG.ADDR.WIDTH.W))
-}
+class TopBundle extends IDUBundle {}
 
 class Top extends Module {
-  val io = IO(new TopBundle)
+  val io   = IO(new TopBundle)
+  val ioRD = IO(new regIOWrite())
 
   val IFU       = Module(new IFU)
   val IDU       = Module(new IDU)
   val logicCtrl = Module(new logicCtrl)
   val SRAM      = Module(new SRAM)
+  val regFile   = Module(new regFile())
+
   IFU.ioIFU <> IDU.ioIFU
   SRAM.io <> IFU.ioAXI
   logicCtrl.ioIFU <> IFU.ioLC
   logicCtrl.ioIDU <> IDU.ioLC
-
-  io.inst                 := IFU.ioIFU.inst
-  io.npc                  := IFU.ioIFU.npc
-  io.pc                   := IFU.ioIFU.pc
-  logicCtrl.ioDeb.isStall := io.isStall
+  regFile.ioRegFile.ioRS1 <> IDU.ioRS1
+  regFile.ioRegFile.ioRS2 <> IDU.ioRS2
+  io <> IDU.ioIDU
+  // for test
+  regFile.ioRegFile.ioRD <> ioRD
 }

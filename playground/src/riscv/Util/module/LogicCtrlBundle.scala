@@ -16,5 +16,5 @@ class logicCtrlIDUBundle extends Bundle {
   val isStall = Output(Bool())
 }
 class logicCtrlDebBundle extends Bundle {
-  val isStall = Input(Bool())
+  // val isStall = Input(Bool())
 }
