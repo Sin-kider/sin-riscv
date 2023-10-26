@@ -259,6 +259,10 @@ uint8_t hex_code[HEX_CODE_LEN] = {
     0xDC, 0x0A, 0x00, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 
+const char *regs[] = {"$0", "ra", "sp",  "gp",  "tp", "t0", "t1", "t2",
+                      "s0", "s1", "a0",  "a1",  "a2", "a3", "a4", "a5",
+                      "a6", "a7", "s2",  "s3",  "s4", "s5", "s6", "s7",
+                      "s8", "s9", "s10", "s11", "t3", "t4", "t5", "t6"};
 void pmem_read(int arAddr, int *rData) {
   printf("read: %x\n", arAddr);
   *rData =
@@ -275,3 +279,8 @@ void pmem_write(int awAddr, int wData, char wSbrt) {
   }
   *(uint32_t *)&hex_code[awAddr - 0x80000000] = data;
 }
+
+void reg_write(int addr, int data) {
+  printf("reg write: rd: %d(%3s) data: %x\n", addr, regs[addr], data);
+}
+void reg_read(int addr) { printf("reg read: %d(%3s)\n", addr, regs[addr]); }

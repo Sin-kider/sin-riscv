@@ -8,13 +8,15 @@ import chisel3.util._
 import riscv.Config._
 import riscv.IFU._
 import riscv.IDU._
+import riscv.EXU._
 import riscv.Util._
-import riscv.Util._
+import riscv.DPIC._
 import riscv.IDU.module._
+import riscv.EXU.module._
 
 // class Top extends SRAM {}
 
-class TopBundle extends IDUBundle {}
+class TopBundle extends EXUBundle {}
 
 class Top extends Module {
   val io   = IO(new TopBundle)
@@ -22,17 +24,27 @@ class Top extends Module {
 
   val IFU       = Module(new IFU)
   val IDU       = Module(new IDU)
+  val EXU       = Module(new EXU)
   val logicCtrl = Module(new logicCtrl)
-  val SRAM      = Module(new SRAM)
-  val regFile   = Module(new regFile())
+  val ISRAM     = Module(new ISRAM)
+  // val DSRAM     = Module(new DSRAM)
+  val regFile = Module(new regFile)
 
   IFU.ioIFU <> IDU.ioIFU
-  SRAM.io <> IFU.ioAXI
+  IDU.ioIDU <> EXU.ioIDU
+  ISRAM.ioISRAM <> IFU.ioAXI
   logicCtrl.ioIFU <> IFU.ioLC
   logicCtrl.ioIDU <> IDU.ioLC
+  logicCtrl.ioEXU <> EXU.ioLC
   regFile.ioRegFile.ioRS1 <> IDU.ioRS1
   regFile.ioRegFile.ioRS2 <> IDU.ioRS2
-  io <> IDU.ioIDU
+  io <> EXU.ioEXU
   // for test
+  val DPICReg = Module(new DPICReg)
+  DPICReg.io.clock := clock
+  DPICReg.io.reset := reset
+  DPICReg.io.ioRegFile.ioRS1 <> IDU.ioRS1
+  DPICReg.io.ioRegFile.ioRS2 <> IDU.ioRS2
+  Tools.ignoreBundle(DPICReg.io.ioRegFile.ioRD)
   regFile.ioRegFile.ioRD <> ioRD
 }

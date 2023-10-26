@@ -10,9 +10,9 @@ import riscv.Util.module._
 
 class IFU extends Module {
   // io
-  val ioIFU = IO(new IFUBundle)
-  val ioLC  = IO(Flipped(new logicCtrlIFUBundle))
-  val ioAXI = IO(new AXILiteMaster)
+  val ioIFU = IO(new IFUBundle())
+  val ioLC  = IO(Flipped(new logicCtrlIFUBundle()))
+  val ioAXI = IO(new AXILiteMaster())
 
   // enum & wire & reg
   val iWritePC :: iReadInst :: Nil = Enum(2)
@@ -25,9 +25,9 @@ class IFU extends Module {
 
   // next pc
   val PCReg = RegEnable(nextPC, CONFIG.ADDR.BASE.U, regEn)
-  isChange := ioLC.isJump | (ioLC.isBranch & ioLC.isBranchSuccess) | ioLC.isEcall
+  isChange := ioLC.isBranchSuccess | ioLC.isEcall
   stepNum  := Mux(ioLC.isStall, 0.U, 4.U)
-  nextPC   := Mux(isChange, ioLC.pcIn, PCReg + stepNum)
+  nextPC   := Mux(isChange, ioLC.branchPC, PCReg + stepNum)
 
   // inst
   regEn          := (iState === iReadInst && ioAXI.r.valid)
@@ -67,7 +67,4 @@ class IFU extends Module {
   ioIFU.pc    := PCReg
   ioIFU.inst  := ioAXI.r.data
   ioIFU.valid := regEn
-
-  // // for test
-  // ioIFU.npc := nextPC
 }

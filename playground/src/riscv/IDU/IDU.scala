@@ -9,9 +9,9 @@ import riscv.Util.module._
 import riscv.Config.CONFIG
 
 class IDU extends Module {
-  val ioIDU = IO(new IDUBundle)
-  val ioIFU = IO(Flipped(new IFUBundle))
-  val ioLC  = IO(Flipped(new logicCtrlIDUBundle))
+  val ioIDU = IO(new IDUBundle())
+  val ioIFU = IO(Flipped(new IFUBundle()))
+  val ioLC  = IO(Flipped(new logicCtrlIDUBundle()))
   val ioRS1 = IO(Flipped(new regIORead()))
   val ioRS2 = IO(Flipped(new regIORead()))
 
@@ -63,15 +63,15 @@ class IDU extends Module {
   // io
   ioIDU.rs1Data    := rs1Data
   ioIDU.rs2Data    := rs2Data
-  ioIDU.rdEn       := RegEnable(rdEn, 0.U, regEn)
-  ioIDU.op1Type    := RegEnable(op1Type, 0.U, regEn)
-  ioIDU.op2Type    := RegEnable(op2Type, 0.U, regEn)
+  ioIDU.rdEn       := RegEnable(rdEn, rd.NOP, regEn)
+  ioIDU.op1Type    := RegEnable(op1Type, op1.NOP, regEn)
+  ioIDU.op2Type    := RegEnable(op2Type, op2.NOP, regEn)
   ioIDU.immData    := RegEnable(immData, 0.U, regEn)
-  ioIDU.aluCtrl    := RegEnable(aluCtrl, 0.U, regEn)
-  ioIDU.branchCtrl := RegEnable(branchCtrl, 0.U, regEn)
-  ioIDU.memCtrl    := RegEnable(memCtrl, 0.U, regEn)
-  ioIDU.csrCtrl    := RegEnable(csrCtrl, 0.U, regEn)
-  ioIDU.valid      := RegNext(ioIFU.valid, false.B)
+  ioIDU.aluCtrl    := RegEnable(aluCtrl, alu.NOP, regEn)
+  ioIDU.branchCtrl := RegEnable(branchCtrl, branch.NOP, regEn)
+  ioIDU.memCtrl    := RegEnable(memCtrl, mem.NOP, regEn)
+  ioIDU.csrCtrl    := RegEnable(csrCtrl, csr.NOP, regEn)
+  ioIDU.valid      := RegNext(regEn, false.B)
   ioIDU.inst       := RegEnable(ioIFU.inst, 0.U, regEn)
   ioIDU.pc         := RegEnable(ioIFU.pc, CONFIG.ADDR.BASE.U, regEn)
 
