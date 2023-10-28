@@ -27,6 +27,7 @@ void step_and_dump_wave() {
 }
 
 void reset(void) {
+  VTOP->io_ready = 1;
   VTOP->reset = 1;
   VTOP->eval();
   VTOP->clock = 1;
@@ -50,13 +51,14 @@ void test_IDU(void) {
   VTOP->clock = 1;
   step_and_dump_wave();
   if (VTOP->io_valid) {
-    printf("pc:\t%008x\n", VTOP->io_pc);
+    printf("pc:\t%08x\n", VTOP->io_pc);
     printf("inst:\t%08x ", VTOP->io_inst);
     printInst(VTOP->io_pc, VTOP->io_inst);
     printf("imm\t%d\n", VTOP->io_immData);
     printf("rs1:\t%d(%3s)\n", VTOP->io_rs1Addr, regs[VTOP->io_rs1Addr]);
     printf("rs2:\t%d(%3s)\n", VTOP->io_rs2Addr, regs[VTOP->io_rs2Addr]);
     printf("rd:\t%d(%3s)\n", VTOP->io_rdAddr, regs[VTOP->io_rdAddr]);
+    printf("result:\t%x\n", VTOP->io_ALUresult);
   }
   VTOP->clock = 0;
   step_and_dump_wave();

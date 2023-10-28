@@ -2,6 +2,7 @@ package riscv.EXU
 
 import chisel3._
 import chisel3.util._
+
 import riscv.EXU.module._
 import riscv.IDU.module._
 import riscv.Util.module._
@@ -14,7 +15,7 @@ class EXU extends Module {
 
   // Enable
   val regEn = WireDefault(false.B)
-  regEn := ioIDU.valid
+  regEn := ioIDU.valid & ioEXU.ready
   // op1 & op2
   val operator1 = WireDefault(0.U(CONFIG.DATA.XLEN.W))
   val operator2 = WireDefault(0.U(CONFIG.DATA.XLEN.W))
@@ -60,7 +61,7 @@ class EXU extends Module {
   // io
   ioLC.branchPC        := branchPC
   ioLC.isBranchSuccess := isBranchSuccess
-  ioEXU.valid          := RegNext(regEn, false.B)
+  ioIDU.ready          := ioEXU.ready
   ioEXU.valid          := RegNext(regEn, false.B)
   ioEXU.ALUresult      := ALUresult
   ioEXU.rs1Data        := RegEnable(ioIDU.rs1Data, 0.U, regEn)

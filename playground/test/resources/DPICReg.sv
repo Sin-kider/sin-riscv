@@ -16,7 +16,7 @@ module DPICReg # (
 );
   import "DPI-C" function void reg_write(input int addr, input int data);
   import "DPI-C" function void reg_read(input int addr);
-  always @(*) begin
+  always @(posedge clock) begin
     if (ioRegFile_ioRD_en) begin
       reg_write(ioRegFile_ioRD_addr, ioRegFile_ioRD_data);
     end

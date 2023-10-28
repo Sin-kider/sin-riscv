@@ -2,8 +2,8 @@ package riscv.IDU.module
 
 import chisel3._
 import chisel3.util._
+
 import riscv.Config.CONFIG
-import os.truncate
 
 object rs1 {
   val NOP = false.B

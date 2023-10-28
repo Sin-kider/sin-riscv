@@ -2,6 +2,7 @@ package riscv.IDU.module
 
 import chisel3._
 import chisel3.util._
+
 import riscv.Config.CONFIG
 
 class regFile extends Module {

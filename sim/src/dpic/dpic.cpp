@@ -281,6 +281,8 @@ void pmem_write(int awAddr, int wData, char wSbrt) {
 }
 
 void reg_write(int addr, int data) {
-  printf("reg write: rd: %d(%3s) data: %x\n", addr, regs[addr], data);
+  // printf("reg write: rd: %d(%3s) data: %x\n", addr, regs[addr], data);
 }
-void reg_read(int addr) { printf("reg read: %d(%3s)\n", addr, regs[addr]); }
+void reg_read(int addr) {
+  // printf("reg read: %d(%3s)\n", addr, regs[addr]);
+}

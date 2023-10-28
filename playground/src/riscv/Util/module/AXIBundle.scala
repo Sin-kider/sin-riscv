@@ -3,8 +3,8 @@ package riscv.Util.module
 import chisel3._
 import chisel3.util._
 
-import riscv.Config._
 import riscv.Util._
+import riscv.Config.CONFIG
 
 class AXILite_AW extends Bundle {
   val valid = Output(Bool())

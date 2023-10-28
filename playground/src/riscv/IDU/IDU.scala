@@ -3,8 +3,8 @@ package riscv.IDU
 import chisel3._
 import chisel3.util._
 
-import riscv.IDU.module._
 import riscv.IFU.module._
+import riscv.IDU.module._
 import riscv.Util.module._
 import riscv.Config.CONFIG
 
@@ -27,7 +27,7 @@ class IDU extends Module {
   val immU    = if (CONFIG.RISCV.RV64) Cat(Fill(32, ioIFU.inst(31)), Cat(ioIFU.inst(31, 12), Fill(12, 0.U))) else Cat(ioIFU.inst(31, 12), Fill(12, 0.U))
   val immJ    = Cat(Fill(CONFIG.DATA.XLEN - 20, ioIFU.inst(31)), ioIFU.inst(31), ioIFU.inst(19, 12), ioIFU.inst(20), ioIFU.inst(30, 21), Fill(1, 0.U))
   val immSAMT = Cat(Fill(CONFIG.DATA.XLEN - 6, 0.U), ioIFU.inst(25, 20))
-  val regEn   = ioIFU.valid
+  val regEn   = ioIFU.valid & ioIDU.ready
 
   // decode
   val rs1En :: rs2En :: rdEn :: op1Type :: op2Type :: aluCtrl :: immType :: branchCtrl :: memCtrl :: csrCtrl :: Nil =
@@ -61,6 +61,7 @@ class IDU extends Module {
     )
   )
   // io
+  ioIFU.ready      := ioIDU.ready
   ioIDU.rs1Data    := rs1Data
   ioIDU.rs2Data    := rs2Data
   ioIDU.rdEn       := RegEnable(rdEn, rd.NOP, regEn)

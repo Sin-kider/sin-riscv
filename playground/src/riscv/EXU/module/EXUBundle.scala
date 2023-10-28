@@ -2,8 +2,9 @@ package riscv.EXU.module
 
 import chisel3._
 import chisel3.util._
+
 import riscv.IDU.module._
-import riscv.Config._
+import riscv.Config.CONFIG
 
 class ALUBundle extends Bundle {
   val aluCtrl = Input(UInt(alu.WIDTH.W))
@@ -11,6 +12,7 @@ class ALUBundle extends Bundle {
   val op2     = Input(UInt(CONFIG.DATA.XLEN.W))
   val result  = Output(UInt(CONFIG.DATA.XLEN.W))
 }
+
 class BranchBundle extends Bundle {
   val branchCtrl      = Input(UInt(branch.WIDTH.W))
   val rs1Data         = Input(UInt(CONFIG.DATA.XLEN.W))
@@ -22,6 +24,7 @@ class BranchBundle extends Bundle {
 }
 
 class EXUBundle extends Bundle {
+  val ready     = Input(Bool())
   val valid     = Output(Bool())
   val ALUresult = Output(UInt(CONFIG.DATA.XLEN.W))
   val rdEn      = Output(Bool())
@@ -36,5 +39,4 @@ class EXUBundle extends Bundle {
   val rs1Addr = Output(UInt(CONFIG.REG.NUM_WIDTH.W))
   val rs2Addr = Output(UInt(CONFIG.REG.NUM_WIDTH.W))
   val immData = Output(UInt(CONFIG.DATA.XLEN.W))
-
 }

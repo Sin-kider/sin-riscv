@@ -2,8 +2,9 @@ package riscv.IDU.module
 
 import chisel3._
 import chisel3.util._
-import riscv.Config.CONFIG
+
 import riscv.IDU.module._
+import riscv.Config.CONFIG
 
 class regIORead extends Bundle {
   val en   = Input(Bool())
@@ -24,6 +25,8 @@ class regFileBundle extends Bundle {
 }
 
 class IDUBundle extends Bundle {
+  val ready      = Input(Bool())
+  val valid      = Output(Bool())
   val rdEn       = Output(Bool())
   val rdAddr     = Output(UInt(CONFIG.REG.NUM_WIDTH.W))
   val rs1Data    = Output(UInt(CONFIG.REG.WIDTH.W))
@@ -37,7 +40,6 @@ class IDUBundle extends Bundle {
   val csrCtrl    = Output(UInt(csr.WIDTH.W))
   val pc         = Output(UInt(CONFIG.ADDR.WIDTH.W))
   val inst       = Output(UInt(CONFIG.INST.WIDTH.W))
-  val valid      = Output(Bool())
   // for test
   val rs1Addr = Output(UInt(CONFIG.REG.NUM_WIDTH.W))
   val rs2Addr = Output(UInt(CONFIG.REG.NUM_WIDTH.W))

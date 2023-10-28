@@ -2,8 +2,9 @@ package riscv.DPIC
 
 import chisel3._
 import chisel3.util._
-import riscv.Util.module._
+
 import riscv.IDU.module._
+import riscv.Util.module._
 
 class DPICReg extends BlackBox with HasBlackBoxPath {
   val io = IO(new Bundle {

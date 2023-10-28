@@ -5,14 +5,15 @@ package riscv.Tool
 import chisel3._
 import chisel3.util._
 
-import riscv.Config._
 import riscv.IFU._
+import riscv.IFU.module._
 import riscv.IDU._
+import riscv.IDU.module._
 import riscv.EXU._
+import riscv.EXU.module._
 import riscv.Util._
 import riscv.DPIC._
-import riscv.IDU.module._
-import riscv.EXU.module._
+import riscv.Config.CONFIG
 
 // class Top extends SRAM {}
 
@@ -22,17 +23,19 @@ class Top extends Module {
   val io   = IO(new TopBundle)
   val ioRD = IO(new regIOWrite())
 
-  val IFU       = Module(new IFU)
-  val IDU       = Module(new IDU)
-  val EXU       = Module(new EXU)
-  val logicCtrl = Module(new logicCtrl)
-  val ISRAM     = Module(new ISRAM)
+  val IFU       = Module(new IFU())
+  val IDU       = Module(new IDU())
+  val EXU       = Module(new EXU())
+  val logicCtrl = Module(new logicCtrl())
+  val iMem      = Module(new iMem())
+  val ISRAM     = Module(new ISRAM())
   // val DSRAM     = Module(new DSRAM)
-  val regFile = Module(new regFile)
+  val regFile = Module(new regFile())
 
   IFU.ioIFU <> IDU.ioIFU
   IDU.ioIDU <> EXU.ioIDU
-  ISRAM.ioISRAM <> IFU.ioAXI
+  ISRAM.ioISRAM <> iMem.ioAXI
+  iMem.ioIMem <> IFU.ioIMem
   logicCtrl.ioIFU <> IFU.ioLC
   logicCtrl.ioIDU <> IDU.ioLC
   logicCtrl.ioEXU <> EXU.ioLC

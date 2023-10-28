@@ -2,7 +2,8 @@ package riscv.EXU.module
 
 import chisel3._
 import chisel3.util._
-import riscv.IDU.module.branch
+
+import riscv.IDU.module._
 import riscv.Config.CONFIG
 
 class Branch extends Module {
@@ -10,6 +11,7 @@ class Branch extends Module {
 
   val branchResult   = WireDefault(false.B)
   val branchPCResult = WireDefault(0.U(CONFIG.ADDR.WIDTH.W))
+
   branchResult := MuxCase(
     false.B,
     Seq(
@@ -37,7 +39,7 @@ class Branch extends Module {
       (ioBranch.branchCtrl === branch.JAL)  -> (ioBranch.pc + ioBranch.offset),
       (ioBranch.branchCtrl === branch.JALR) -> ((ioBranch.pc + ioBranch.offset) & ~1.U(CONFIG.ADDR.WIDTH.W))
     )
-  ) // ioBranch.pc + ioBranch.offset
+  )
 
   ioBranch.isBranchSuccess := branchResult
   ioBranch.branchPC        := branchPCResult

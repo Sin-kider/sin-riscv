@@ -2,8 +2,9 @@ package riscv.EXU.module
 
 import chisel3._
 import chisel3.util._
-import riscv.Config._
-import riscv.IDU.module.alu
+
+import riscv.IDU.module._
+import riscv.Config.CONFIG
 
 class ALU extends Module {
   val ioALU = IO(new ALUBundle())
