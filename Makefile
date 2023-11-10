@@ -2,10 +2,11 @@
 TOP_NAME  = Top
 TOP_DIR   = $(shell pwd)
 BUILD_DIR = $(TOP_DIR)/build
+ONLY_ERR = 2>&1 >/dev/null
 
 # Chisel Config
 CHISEL_BUILD_DIR      = $(BUILD_DIR)/chisel
-CHISEL_DIR            = $(TOP_DIR)/playground
+CHISEL_DIR            = $(TOP_DIR)/sin_riscv
 CHISEL_BUILD_TOP_VSRC = $(CHISEL_BUILD_DIR)/$(TOP_NAME).sv
 CHISEL_BUILD_VSRC     = $(foreach dir,$(CHISEL_BUILD_DIR),$(wildcard $(dir)/*.v)) $(foreach dir,$(CHISEL_BUILD_DIR),$(wildcard $(dir)/*.sv))
 CHISEL_SRC_DIR        = $(CHISEL_DIR)/src
@@ -35,7 +36,6 @@ SIM_WAVE_PATH     = $(SIM_BUILD_DIR)/wave.vcd
 VAL_LIBS         += $(shell llvm-config --libs)
 VAL_LDFLAGS       = $(foreach lib, $(VAL_LIBS), -LDFLAGS $(lib))
 
-
 export PATH := $(PATH):$(CHISEL_FIRTOOL_PATH)
 
 default: $(SIM_BINFILE_PATH)
@@ -44,26 +44,25 @@ verilog: $(CHISEL_BUILD_TOP_VSRC)
 
 verilator: $(SIM_BINFILE_PATH)
 
-run: $(SIM_BINFILE_PATH)
+sim: $(SIM_BINFILE_PATH)
+	@echo --- start ---
 	@cd $(SIM_BUILD_DIR) && ./$(TOP_NAME)
 
 show: $(SIM_WAVE_PATH)
 	@gtkwave $(SIM_WAVE_PATH)
 
 $(SIM_BINFILE_PATH): $(VAL_VSRC_PATH) $(SIM_SRC_PATH) $(CHISEL_BUILD_TOP_VSRC)
-	@echo MKDIR $(SIM_BUILD_DIR)
+	@echo --- verilator ---
 	@mkdir -p $(SIM_BUILD_DIR)
-	@echo GEN $(notdir $(SIM_BINFILE_PATH))
-	$(VAL) $(VAL_FLAGS) \
+	@$(VAL) $(VAL_FLAGS) \
 	  --top-module $(TOP_NAME) \
 		$(SIM_SRC_PATH) $(CHISEL_BUILD_VSRC) \
 		$(VAL_CFLAGS) --Mdir $(SIM_OBJ_DIR) --trace --exe \
-		-o $@ $(VAL_LDFLAGS) -j 8
+		-o $@ $(VAL_LDFLAGS) -j 8 $(ONLY_ERR)
 
 $(CHISEL_BUILD_TOP_VSRC): $(CHISEL_SRC_PATH) $(VAL_VSRC_PATH)
-	@echo MKDIR $(CHISEL_BUILD_DIR)
+	@echo --- verilog ---
 	@mkdir -p $(CHISEL_BUILD_DIR)
-	@echo GEN $(notdir $(CHISEL_BUILD_VSRC))
 	@mill -i __.runMain $(CHISEL_TOOL) --split-verilog -td $(CHISEL_BUILD_DIR)
 
 fmt:

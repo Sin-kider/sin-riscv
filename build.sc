@@ -3,10 +3,10 @@ import mill.scalalib._
 import mill.scalalib.scalafmt.ScalafmtModule
 import mill.scalalib.TestModule.Utest
 
-object playground extends ScalaModule with ScalafmtModule { m =>
-  val useChisel5            = false
-  override def millSourcePath = os.pwd / "playground"
-  override def scalaVersion = "2.13.10"
+object sin_riscv extends ScalaModule with ScalafmtModule { m =>
+  val useChisel5              = false
+  override def millSourcePath = os.pwd / "sin_riscv"
+  override def scalaVersion   = "2.13.10"
   override def scalacOptions = Seq(
     "-language:reflectiveCalls",
     "-deprecation",
